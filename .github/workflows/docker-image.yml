@@ -26,6 +26,7 @@ jobs:
           tags: jipp13/docker:latest
           build-args: |
             version=3.12.3
+            ver=3.12.3
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
