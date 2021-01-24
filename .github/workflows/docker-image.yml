@@ -16,7 +16,9 @@ jobs:
     strategy:
       matrix:
         build:
+          - { version: "3.11.7", tag: "alpine-3.11.7" }
           - { version: "3.12.3", tag: "alpine-3.12.3" }
+          - { version: "3.13.0", tag: "alpine-3.13.0" }
           - { version: "latest", tag: "latest" }
     steps:
     - name: checkout
@@ -38,9 +40,3 @@ jobs:
         tags: jipp13/docker:${{ matrix.build.tag }}
         build-args: |
           version=${{ matrix.build.version }}
-#    - name: update dockerhub description
-#      uses: peter-evans/dockerhub-description@v2
-#      with:
-#          username: ${{ secrets.DOCKER_USERNAME }}
-#          password: ${{ secrets.DOCKER_PASSWORD }}
-#          repository: jipp13/docker

@@ -1,4 +1,4 @@
-ARG version=3.12.3
+ARG version=latest
 
 FROM alpine:$version
 
