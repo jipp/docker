@@ -29,9 +29,9 @@ jobs:
       with:
         platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x
         push: true
-        tags: jipp13/docker:${{ matrix.version }}
+        tags: jipp13/docker:alpine-${{ matrix.version }}
         build-args: |
-          version=${{ matrix.version }}
+          version=alpine-${{ matrix.version }}
 #    - name: update dockerhub description
 #      uses: peter-evans/dockerhub-description@v2
 #      with:
