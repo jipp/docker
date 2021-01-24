@@ -16,10 +16,8 @@ jobs:
     strategy:
       matrix:
         build:
-          - { version: "3.11.7", tag: "alpine-3.11.7" }
-          - { version: "3.12.3", tag: "alpine-3.12.3" }
-          - { version: "3.13.0", tag: "alpine-3.13.0" }
-          - { version: "latest", tag: "latest" }
+        - { version: "3.11.7", tag: "alpine-3.11.7" }
+        - { version: "3.12.3", tag: "alpine-3.12.3" }
     steps:
     - name: checkout
       uses: actions/checkout@v2
@@ -32,7 +30,7 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-    - name: build and push
+    - name: build and push legacy
       uses: docker/build-push-action@v2
       with:
         platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x
@@ -40,3 +38,11 @@ jobs:
         tags: jipp13/docker:${{ matrix.build.tag }}
         build-args: |
           version=${{ matrix.build.version }}
+    - name: build and push latest
+      uses: docker/build-push-action@v2
+      with:
+        platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x
+        push: true
+        tags: jipp13/docker
+        build-args: |
+          version="latest"
