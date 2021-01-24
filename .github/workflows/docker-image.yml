@@ -9,8 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    matrix:
-      version: [3.12.3, latest]
+    strategy:
+      matrix:
+        version: [3.12.3, latest]
     steps:
     - name: checkout
       uses: actions/checkout@v2
