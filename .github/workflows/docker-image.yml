@@ -18,7 +18,8 @@ jobs:
         build:
         - { version: "3.11.7", tag: "alpine-3.11.7" }
         - { version: "3.12.3", tag: "alpine-3.12.3" }
-        - { version: "3.13.0", tag: "latest" }
+        - { version: "latest", tag: "alpine-latest" }
+        - { version: "latest", tag: "latest" }
     steps:
     - name: checkout
       uses: actions/checkout@v2
