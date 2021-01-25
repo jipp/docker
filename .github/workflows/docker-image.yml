@@ -17,10 +17,10 @@ jobs:
       fail-fast: false
       matrix:
         build:
-        - { version: "3.11.7", tag: "alpine-3.11.7" }
-        - { version: "3.12.3", tag: "alpine-3.12.3" }
-        - { version: "latest", tag: "alpine-latest" }
         - { version: "latest", tag: "latest" }
+        - { version: "latest", tag: "alpine-latest" }
+        - { version: "3.12.3", tag: "alpine-3.12.3" }
+        - { version: "3.11.7", tag: "alpine-3.11.7" }
     steps:
     - name: checkout
       uses: actions/checkout@v2
