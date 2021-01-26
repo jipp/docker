@@ -2,7 +2,7 @@
 set -e
 
 if [ $# -eq 0 ]; then
-    echo "command missing"
+    cat help.txt
 fi
 
 exec "$@"

@@ -7,4 +7,5 @@ RUN apk update && \
  rm -rf /var/cache/apk/*
 
 COPY entrypoint.sh /entrypoint.sh
+COPY help.txt /help.txt
 ENTRYPOINT ["/entrypoint.sh"]
