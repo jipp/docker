@@ -1,5 +1,5 @@
 tools available:
 
-iperf
-nmap
-tcpdump
+iperf -h
+nmap -h
+tcpdump -h
