@@ -10,7 +10,7 @@ if [ -f "$FILE" ]; then
 fi
 
 if [ $# -eq 0 ]; then
-    /cat help.txt
+    cat /help.txt
 fi
 
 exec "$@"
