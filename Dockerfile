@@ -8,6 +8,8 @@ RUN apk update && \
 
 EXPOSE 5001/tcp
 EXPOSE 5001/udp
+EXPOSE 5201/tcp
+EXPOSE 5201/udp
 
 COPY entrypoint.sh /entrypoint.sh
 COPY help.txt /help.txt
