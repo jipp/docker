@@ -1,19 +1,26 @@
-name: Docker Image CI
+name: Docker Image
 
 on:
   push:
-    branches: [ main ]
+    branches:
+    - main
+    - master
     paths-ignore:
     - '**.md'
+    - '.github/**'
   pull_request:
-    branches: [ main ]
+    branches:
+    - main
+    - master
     paths-ignore:
     - '**.md'
+    - '.github/**'
   schedule:
     - cron: "3 4 * * 5"
 
 jobs:
   build:
+  name: build
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
