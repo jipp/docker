@@ -20,7 +20,7 @@ on:
 
 jobs:
   build:
-  name: build
+    name: build
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
