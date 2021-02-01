@@ -18,9 +18,10 @@ on:
   schedule:
     - cron: "3 4 * * 5"
 
+env:
+  container: ${{ 'jipp13/docker' }}
+
 jobs:
-  env:
-    container: ${{ 'jipp13/docker' }}
   build:
     name: build
     runs-on: ubuntu-latest
