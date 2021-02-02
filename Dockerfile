@@ -3,7 +3,7 @@ ARG version=latest
 FROM alpine:$version
 
 RUN apk update && \
- apk add bash tcpdump iperf iperf3 nmap bind net-snmp && \
+ apk add bash tcpdump iperf iperf3 nmap bind net-snmp fping && \
  rm -rf /var/cache/apk/*
 
 EXPOSE 5001/tcp
