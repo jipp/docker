@@ -1,0 +1,43 @@
+name: octoprint
+services:
+  octoprint:
+    container_name: octoprint
+    devices:
+    - /dev/ttyUSB0:/dev/ttyUSB0
+    - /dev/video0:/dev/video0
+    environment:
+      CAMERA_DEV: /dev/video0
+      ENABLE_MJPG_STREAMER: "true"
+      TZ: Europe/Berlin
+    hostname: octoprint
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - curl http://127.0.0.1 -s -o /dev/null > /dev/null 2>&1
+      start_period: 10s
+    image: octoprint/octoprint
+    networks:
+      octoprint: null
+    ports:
+    - target: 80
+      published: "80"
+    restart: unless-stopped
+    volumes:
+    - type: volume
+      source: octoprint
+      target: /octoprint
+networks:
+  octoprint:
+    name: octoprint
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: octoprint
+    ipam:
+      driver: default
+      config:
+      - subnet: 192.168.17.0/24
+      - subnet: fd00:0:0:17::/64
+    enable_ipv6: true
+volumes:
+  octoprint:
+    name: octoprint
