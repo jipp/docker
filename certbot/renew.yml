@@ -1,0 +1,23 @@
+name: certbot
+services:
+  certbot:
+    command:
+    - renew
+    - -v
+    - --dry-run
+    container_name: certbot
+    hostname: certbot
+    image: certbot/certbot
+    network_mode: host
+    restart: "no"
+    volumes:
+    - type: bind
+      source: /docker/certbot/etc/letsencrypt
+      target: /etc/letsencrypt
+      bind:
+        create_host_path: true
+    - type: bind
+      source: /docker/certbot/var/lib/letsencrypt
+      target: /var/lib/letsencrypt
+      bind:
+        create_host_path: true
