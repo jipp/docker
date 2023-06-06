@@ -1,5 +1,32 @@
 name: octoprint
 services:
+  nginx:
+    container_name: nginx
+    depends_on:
+      octoprint:
+        condition: service_healthy
+    environment:
+      TZ: Europe/Berlin
+    hostname: nginx
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - curl http://127.0.0.1:8888/octopi -k -s -o /dev/null > /dev/null 2>&1
+    image: nginx
+    networks:
+      octoprint: null
+    ports:
+#    - target: 80
+#      published: "88"
+    - target: 8888
+      published: "8888"
+    restart: unless-stopped
+    volumes:
+    - type: bind
+      source: /docker/nginx/conf.d
+      target: /etc/nginx/conf.d
+      bind:
+        create_host_path: true
   octoprint:
     container_name: octoprint
     devices:
@@ -8,6 +35,7 @@ services:
     environment:
       CAMERA_DEV: /dev/video0
       ENABLE_MJPG_STREAMER: "true"
+      MJPG_STREAMER_INPUT: -y -n -r 1280x720
       TZ: Europe/Berlin
     hostname: octoprint
     healthcheck:
