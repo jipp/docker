@@ -10,5 +10,5 @@ RESULT=$(grep "dry-run" $FILE | grep -v "#" | wc -l)
 
 if [ $RESULT -eq 0 ]; then
 	echo "copy"
-	sudo cp -r /docker/certbot/etc/letsencrypt/archive/dyndns.wobilix.de /docker/homeassistant/config
+	sudo cp -rL /docker/certbot/etc/letsencrypt/live/dyndns.wobilix.de /docker/homeassistant/config
 fi
