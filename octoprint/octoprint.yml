@@ -11,14 +11,12 @@ services:
     healthcheck:
       test:
       - CMD-SHELL
-      - curl http://127.0.0.1:8888/octopi -k -s -o /dev/null > /dev/null 2>&1
+      - curl http://127.0.0.1/octopi -k -s -o /dev/null > /dev/null 2>&1
     image: nginx
     networks:
       octoprint: null
     ports:
-#    - target: 80
-#      published: "88"
-    - target: 8888
+    - target: 80
       published: "8888"
     restart: unless-stopped
     volumes:
@@ -42,7 +40,6 @@ services:
       test:
       - CMD-SHELL
       - curl http://127.0.0.1 -s -o /dev/null > /dev/null 2>&1
-      start_period: 10s
     image: octoprint/octoprint
     networks:
       octoprint: null
