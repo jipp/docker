@@ -2,7 +2,7 @@ substitutions:
   devicename: basement
   comment: Gas und Strom
   name: woke.basement
-  version: 1.0.0
+  version: 1.0.1
   logger: INFO
   status_led: GPIO5
   tx_pin: GPIO17
