@@ -1,0 +1,57 @@
+name: wordpress
+services:
+  mariadb:
+    container_name: mariadb
+    environment:
+      MARIADB_DATABASE: wordprsssdb
+      MARIADB_PASSWORD: 0acht15
+      MARIADB_ROOT_PASSWORD: 0acht15
+      MARIADB_USER: wordpress
+      TZ: Europe/Berlin
+    hostname: mariadb
+    image: mariadb
+    networks:
+      wordpress: null
+    volumes:
+    - type: bind
+      source: /docker/mariadb/mysql
+      target: /var/lib/mysql
+      bind:
+        create_host_path: true
+  wordpress:
+    container_name: wordpress
+    depends_on:
+      mariadb:
+        condition: service_started
+        required: true
+    environment:
+      TZ: Europe/Berlin
+      WORDPRESS_DB_HOST: mariadb
+      WORDPRESS_DB_NAME: wordprsssdb
+      WORDPRESS_DB_PASSWORD: 0acht15
+      WORDPRESS_DB_USER: wordpress
+    hostname: wordpress
+    image: wordpress
+    networks:
+      wordpress: null
+    ports:
+    - target: 80
+      published: "8080"
+    volumes:
+    - type: bind
+      source: /docker/wordpress/html
+      target: /var/www/html
+      bind:
+        create_host_path: true
+networks:
+  wordpress:
+    name: wordpress
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: wordpress
+    ipam:
+      driver: default
+      config:
+      - subnet: 192.168.17.0/24
+      - subnet: fd00:0:0:17::/64
+    enable_ipv6: true
