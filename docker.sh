@@ -5,20 +5,22 @@ YAML=`find . -maxdepth 1 \( -name "*.yml" -o -name "*.yaml" \)`
 function execute() {
 	for FILE in $YAML
 	do
-		echo
-		docker compose $FLAGS -f $FILE $1
+		echo docker compose -f $FILE $@
+		docker compose -f $FILE $@
 	done
 }
 
 function prune() {
+	echo docker system prune -f
 	docker system prune -f
 }
 
 function status() {
+	echo docker images
 	docker images
-	echo
+	echo docker ps -a
 	docker ps -a
-	echo
+	echo docker compose ls -a
 	docker compose ls -a
 }
 
@@ -27,7 +29,7 @@ function list() {
 }
 
 function help() {
-	echo "Usage: $0 {up|run|down|pull|rm|ps|config|prune|status} [flags]"
+	echo "Usage: $0 {up|down|pull|rm|ps|config|logs|prune|status} [flags]"
 	exit 1
 }
 
@@ -40,17 +42,10 @@ shift
 FLAGS=$@
 
 case "$COMMAND" in
-	'up')		execute "up -d" ;;
-	'run')		execute "up" ;;
-	'down')		execute "down" ;;
-	'pull')		execute "pull" ;;
-	'rm')		execute "rm -f" ;;
-	'ps')		execute "ps -a" ;;
-	'config')	execute "config" ;;
 	'prune')	prune ;;
 	'status')	status ;;
 	'list')		list ;;
-	*)		help ;;
+	*)		execute $COMMAND $FLAGS;;
 esac
 
 exit 0

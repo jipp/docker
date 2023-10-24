@@ -2,7 +2,7 @@
 
 ../docker.sh pull
 ../docker.sh prune
-../docker.sh run
+../docker.sh up
 ../docker.sh rm
 
 FILE=$(../docker.sh list)

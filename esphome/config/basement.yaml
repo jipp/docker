@@ -63,6 +63,8 @@ sensor:
   state_class: total_increasing
   filters:
   - multiply: 0.00001
+  - throttle: 1s
+  - throttle_average: 60s
 - platform: sml
   name: Zählerstand zu -A, tariflos
   obis_code: 1-0:2.8.0
@@ -72,6 +74,8 @@ sensor:
   state_class: total_increasing
   filters:
   - multiply: 0.00001
+  - throttle: 1s
+  - throttle_average: 60s
 - platform: sml
   name: Summe der Momentan-Leistungen in allen Phasen
   obis_code: 1-0:16.7.0
@@ -81,6 +85,8 @@ sensor:
   state_class: measurement
   filters:
   - multiply: 0.01
+  - throttle: 1s
+  - throttle_average: 60s
 - platform: sml
   name: Momentane Leistung in Phase L1
   obis_code: 1-0:36.7.0
@@ -90,6 +96,8 @@ sensor:
   state_class: measurement
   filters:
   - multiply: 0.01
+  - throttle: 1s
+  - throttle_average: 60s
 - platform: sml
   name: Momentane Leistung in Phase L2
   obis_code: 1-0:56.7.0
@@ -99,6 +107,8 @@ sensor:
   state_class: measurement
   filters:
   - multiply: 0.01
+  - throttle: 1s
+  - throttle_average: 60s
 - platform: sml
   name: Momentane Leistung in Phase L3
   obis_code: 1-0:76.7.0
@@ -108,6 +118,8 @@ sensor:
   state_class: measurement
   filters:
   - multiply: 0.01
+  - throttle: 1s
+  - throttle_average: 60s
 
 binary_sensor:
 - <<: !include common/binary_sensor_status.yaml
