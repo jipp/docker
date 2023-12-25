@@ -5,19 +5,20 @@ services:
     depends_on:
       octoprint:
         condition: service_healthy
+        required: true
     environment:
       TZ: Europe/Berlin
     hostname: nginx
     healthcheck:
       test:
       - CMD-SHELL
-      - curl http://127.0.0.1/octopi -k -s -o /dev/null > /dev/null 2>&1
+      - curl https://127.0.0.1 -k -s -o /dev/null > /dev/null 2>&1
     image: nginx
     networks:
       octoprint: null
     ports:
-    - target: 80
-      published: "8888"
+    - target: 443
+      published: "443"
     restart: unless-stopped
     volumes:
     - type: bind
