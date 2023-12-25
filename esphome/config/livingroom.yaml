@@ -1,41 +1,36 @@
 substitutions:
   devicename: livingroom
-  comment: Helligkeit
+  comment: illuminance
   name: woke.livingroom
-  version: 1.0.1
+  version: 2.2.1
   logger: INFO
-  status_led: D4
-  sda: D2
-  scl: D1
+  sda_pin: GPIO2
+  scl_pin: GPIO1
+  button_pin: GPIO41
+  ir_pin: GPIO4
+  rpg_pin: GPIO35
+  illuminance: illuminance
 
-<<: !include common/esphome.yaml
+<<: !include common/base.yaml
+<<: !include common/i2c.yaml
 
-esp8266:
-  board: d1_mini_pro
+esp32:
+  board: esp32-s3-devkitc-1
 
 logger:
   <<: !include common/logger.yaml
 
-i2c:
-- sda: ${sda}
-  scl: ${scl}
-
 text_sensor:
-- <<: !include common/text_sensor.yaml
-
-status_led:
-  pin:
-    number: ${status_led}
-    inverted: true
+- <<: !include common/text_sensor_version.yaml
+- <<: !include common/text_sensor_wifi_info.yaml
 
 sensor:
 - <<: !include common/sensor_uptime.yaml
 - <<: !include common/sensor_wifi_signal.yaml
 - platform: bh1750
-  name: illuminance
+  name: ${illuminance}
+  id: sensor_bh1750_illuminance
   icon: mdi:sun-wireless-outline
 
 binary_sensor:
 - <<: !include common/binary_sensor_status.yaml
-
-<<: !include common/base.yaml

@@ -1,2 +1,3 @@
 - platform: status
-  name: ${devicename}
+  name: Home Assistant
+  id: binary_sensor_status

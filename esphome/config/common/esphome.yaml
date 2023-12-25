@@ -1,6 +1,0 @@
-esphome:
-  name: ${devicename}
-  comment: ${comment}
-  project:
-    name: ${name}
-    version: ${version}
