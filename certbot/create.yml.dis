@@ -15,7 +15,6 @@ services:
     - dyndns.wobilix.de
     container_name: certbot
     hostname: certbot
-#    image: certbot/certbot:arm64v8-latest
     image: certbot/certbot
     network_mode: host
     restart: "no"
