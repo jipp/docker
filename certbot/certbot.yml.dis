@@ -1,20 +1,10 @@
 name: certbot
 services:
   certbot:
-    command:
-    - renew
-    - --dry-run
-    - -v
     container_name: certbot
     hostname: certbot
     image: certbot/certbot
-    networks:
-      default: null
-    ports:
-    - mode: ingress
-      target: 80
-      published: "8080"
-      protocol: tcp
+    network_mode: host
     restart: "no"
     volumes:
     - type: bind
@@ -32,6 +22,4 @@ services:
       target: /var/log/letsencrypt
       bind:
         create_host_path: true
-networks:
-  default:
-    name: certbot_default
+

@@ -21,10 +21,10 @@ services:
         create_host_path: true
   nginx:
     container_name: nginx
-    depends_on:
-      homeassistant:
-        condition: service_healthy
-        required: true
+#    depends_on:
+#      homeassistant:
+#        condition: service_healthy
+#        required: true
     environment:
       TZ: Europe/Berlin
     hostname: nginx

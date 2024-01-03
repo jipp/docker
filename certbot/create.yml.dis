@@ -16,7 +16,13 @@ services:
     container_name: certbot
     hostname: certbot
     image: certbot/certbot
-    network_mode: host
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 80
+      published: "8080"
+      protocol: tcp
     restart: "no"
     volumes:
     - type: bind
@@ -29,4 +35,11 @@ services:
       target: /var/lib/letsencrypt
       bind:
         create_host_path: true
-
+    - type: bind
+      source: /docker/certbot/var/log/letsencrypt
+      target: /var/log/letsencrypt
+      bind:
+        create_host_path: true
+networks:
+  default:
+    name: certbot_default
