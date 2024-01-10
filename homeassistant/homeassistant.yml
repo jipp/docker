@@ -33,6 +33,14 @@ services:
       - CMD-SHELL
       - curl http://127.0.0.1 -s -o /dev/null > /dev/null 2>&1
     image: nginx
+    deploy:
+      resources:
+        limits:
+          cpus: '1.00'
+          memory: 200M
+        reservations:
+          cpus: '0.50'
+          memory: 100M
     network_mode: host
     restart: unless-stopped
     volumes:
