@@ -1,0 +1,14 @@
+name: certbot
+services:
+  certbot:
+    command: ${COMMAND}
+    container_name: certbot
+    hostname: certbot
+    image: certbot/certbot
+    ports:
+      - 8080:80
+    restart: no
+    volumes:
+      - /docker/certbot/etc/letsencrypt:/etc/letsencrypt
+      - /docker/certbot/var/lib/letsencrypt:/var/lib/letsencrypt
+      - /docker/certbot/var/log/letsencrypt:/var/log/letsencrypt

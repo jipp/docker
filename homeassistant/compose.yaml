@@ -21,10 +21,14 @@ services:
         create_host_path: true
   nginx:
     container_name: nginx
-#    depends_on:
-#      homeassistant:
-#        condition: service_healthy
-#        required: true
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: "20M"
+        reservations:
+          cpus: "0.50"
+          memory: "10M"
     environment:
       TZ: Europe/Berlin
     hostname: nginx
@@ -33,14 +37,6 @@ services:
       - CMD-SHELL
       - curl http://127.0.0.1 -s -o /dev/null > /dev/null 2>&1
     image: nginx
-    deploy:
-      resources:
-        limits:
-          cpus: '1.00'
-          memory: 200M
-        reservations:
-          cpus: '0.50'
-          memory: 100M
     network_mode: host
     restart: unless-stopped
     volumes:

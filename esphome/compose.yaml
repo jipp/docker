@@ -1,0 +1,26 @@
+name: esphome
+services:
+  basement:
+    command:
+      - ${COMMAND} basement.yaml
+    container_name: basement
+    environment:
+      - TZ=Europe/Berlin
+    hostname: basement
+    image: esphome/esphome:latest
+    network_mode: host
+    restart: no
+    volumes:
+      - ./config:/config
+  livingroom:
+    command:
+      - ${COMMAND} livingroom.yaml
+    container_name: livingroom
+    environment:
+      - TZ=Europe/Berlin
+    hostname: livingroom
+    image: esphome/esphome:latest
+    network_mode: host
+    restart: no
+    volumes:
+      - ./config:/config
