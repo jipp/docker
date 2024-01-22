@@ -2,25 +2,37 @@ name: esphome
 services:
   basement:
     command:
-      - ${COMMAND} basement.yaml
+    - ${COMMAND}
+    - basement.yaml
     container_name: basement
     environment:
-      - TZ=Europe/Berlin
-    hostname: basement
+      TZ: Europe/Berlin
     image: esphome/esphome:latest
     network_mode: host
-    restart: no
+    restart: "no"
+    stdin_open: true
+    tty: true
     volumes:
-      - ./config:/config
+    - type: bind
+      source: /home/pi/docker/esphome/config
+      target: /config
+      bind:
+        create_host_path: true
   livingroom:
     command:
-      - ${COMMAND} livingroom.yaml
+    - ${COMMAND}
+    - livingroom.yaml
     container_name: livingroom
     environment:
-      - TZ=Europe/Berlin
-    hostname: livingroom
+      TZ: Europe/Berlin
     image: esphome/esphome:latest
     network_mode: host
-    restart: no
+    restart: "no"
+    stdin_open: true
+    tty: true
     volumes:
-      - ./config:/config
+    - type: bind
+      source: /home/pi/docker/esphome/config
+      target: /config
+      bind:
+        create_host_path: true
