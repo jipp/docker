@@ -2,46 +2,54 @@ name: homeassistant
 services:
   homeassistant:
     container_name: homeassistant
+    deploy:
+      resources:
+        limits:
+          cpus: "3.00"
+          memory: "2G"
+        reservations:
+          cpus: "1.50"
+          memory: "1G"
     environment:
       TZ: Europe/Berlin
     hostname: homeassistant
     healthcheck:
       test:
-      - CMD-SHELL
-      - curl http://127.0.0.1:8123 -s -o /dev/null > /dev/null 2>&1
+        - CMD-SHELL
+        - curl http://127.0.0.1:8123 -s -o /dev/null > /dev/null 2>&1
       start_period: 10s
     image: homeassistant/home-assistant:latest
     network_mode: host
     restart: unless-stopped
     volumes:
-    - type: bind
-      source: /docker/homeassistant/config
-      target: /config
-      bind:
-        create_host_path: true
+      - type: bind
+        source: /docker/homeassistant/config
+        target: /config
+        bind:
+          create_host_path: true
   nginx:
     container_name: nginx
     deploy:
       resources:
         limits:
           cpus: "1.00"
-          memory: "20M"
+          memory: "40M"
         reservations:
           cpus: "0.50"
-          memory: "10M"
+          memory: "20M"
     environment:
       TZ: Europe/Berlin
     hostname: nginx
     healthcheck:
       test:
-      - CMD-SHELL
-      - curl http://127.0.0.1 -s -o /dev/null > /dev/null 2>&1
+        - CMD-SHELL
+        - curl http://127.0.0.1 -s -o /dev/null > /dev/null 2>&1
     image: nginx
     network_mode: host
     restart: unless-stopped
     volumes:
-    - type: bind
-      source: /docker/nginx/conf.d
-      target: /etc/nginx/conf.d
-      bind:
-        create_host_path: true
+      - type: bind
+        source: /docker/nginx/conf.d
+        target: /etc/nginx/conf.d
+        bind:
+          create_host_path: true
