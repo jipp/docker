@@ -8,7 +8,7 @@
 ../docker.sh up
 ../docker.sh rm -f
 
-FILE=$(../docker.sh list)
+FILE=.env
 RESULT=$(grep "dry-run" $FILE | grep -v "#" | wc -l)
 
 if [ $RESULT -eq 0 ]; then

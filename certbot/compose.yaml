@@ -1,8 +1,7 @@
 name: certbot
 services:
   certbot:
-    command:
-      - ${COMMAND}
+    command: ${COMMAND}
     container_name: certbot
     environment:
       TZ: Europe/Berlin
