@@ -1,0 +1,105 @@
+name: lemonpi
+services:
+  homeassistant:
+    container_name: homeassistant
+    deploy:
+      resources:
+        limits:
+          cpus: "3.00"
+          memory: "2G"
+        reservations:
+          cpus: "1.50"
+          memory: "1G"
+    environment:
+      TZ: Europe/Berlin
+    hostname: homeassistant
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - curl http://127.0.0.1:8123 -s -o /dev/null > /dev/null 2>&1
+      start_period: 10s
+    image: homeassistant/home-assistant:latest
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /docker/homeassistant/config
+        target: /config
+        bind:
+          create_host_path: true
+  nginx:
+    container_name: nginx
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: "20M"
+        reservations:
+          cpus: "0.50"
+          memory: "10M"
+    environment:
+      TZ: Europe/Berlin
+    hostname: nginx
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - curl http://127.0.0.1 -s -o /dev/null > /dev/null 2>&1
+    image: nginx
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /docker/nginx/conf.d
+        target: /etc/nginx/conf.d
+        bind:
+          create_host_path: true
+  octoprint:
+    container_name: octoprint
+    deploy:
+      resources:
+        limits:
+          cpus: "3.00"
+          memory: "1G"
+        reservations:
+          cpus: "1.50"
+          memory: "500M"
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+      - /dev/video0:/dev/video0
+    environment:
+      CAMERA_DEV: /dev/video0
+      ENABLE_MJPG_STREAMER: "true"
+      MJPG_STREAMER_INPUT: -y -n -r 1280x720
+      TZ: Europe/Berlin
+    hostname: octoprint
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - curl http://127.0.0.1 -s -o /dev/null > /dev/null 2>&1
+    image: octoprint/octoprint
+    networks:
+      octoprint: null
+    ports:
+      - mode: ingress
+        target: 88
+        published: "80"
+        protocol: tcp
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /docker/octoprint
+        target: /octoprint
+        bind:
+          create_host_path: true
+networks:
+  octoprint:
+    name: octoprint
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: octoprint
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.17.0/24
+        - subnet: fd00:0:0:17::/64
+    enable_ipv6: true
