@@ -14,9 +14,9 @@ fi
 
 if [ -c /dev/ttyUSB0 ]
 then
-	docker run --rm --device /dev/ttyUSB0 -v "${PWD}":/config -it esphome/esphome $@
+	docker run --rm --device /dev/ttyUSB0 -v "${PWD}/config":/config -it esphome/esphome $@
 else
-	docker run --rm --network host -v "${PWD}":/config -it esphome/esphome $@
+	docker run --rm --network host -v "${PWD}/config":/config -it esphome/esphome $@
 fi
 
 exit 0

@@ -14,7 +14,7 @@ services:
     tty: true
     volumes:
       - type: bind
-        source: /home/pi/docker/esphome/config
+        source: ${PWD}/config
         target: /config
         bind:
           create_host_path: true
@@ -32,7 +32,7 @@ services:
     tty: true
     volumes:
       - type: bind
-        source: /home/pi/docker/esphome/config
+        source: ${PWD}/config
         target: /config
         bind:
           create_host_path: true
