@@ -2,7 +2,7 @@ substitutions:
   devicename: livingroom
   comment: illuminance
   name: woke.livingroom
-  version: 2.2.1
+  version: 2.2.3
   logger: INFO
   sda_pin: GPIO2
   scl_pin: GPIO1
@@ -11,8 +11,8 @@ substitutions:
   rpg_pin: GPIO35
   illuminance: illuminance
 
-<<: !include common/base.yaml
-<<: !include common/i2c.yaml
+esphome:
+  <<: !include common/esphome.yaml
 
 esp32:
   board: esp32-s3-devkitc-1
@@ -34,3 +34,44 @@ sensor:
 
 binary_sensor:
 - <<: !include common/binary_sensor_status.yaml
+
+button:
+- <<: !include common/restart.yaml
+
+light:
+- platform: neopixelbus
+  variant: WS2811
+  pin: ${rpg_pin}
+  num_leds: 1
+  id: rgbled
+- platform: status_led
+  id: statusled
+  output: statusoutput
+
+output:
+- platform: template
+  id: statusoutput
+  write_action:
+    then:
+    - if:
+        condition:
+          lambda: !lambda |-
+            return state == 0;
+        then:
+        - light.turn_on:
+            id: rgbled
+            red: 0.0
+            green: 1.0
+            blue: 0.0
+            brightness: 30%
+        else:
+        - light.turn_on:
+            id: rgbled
+            red: 1.0
+            green: 0.0
+            blue: 0.0
+            brightness: 30%
+  type: binary
+
+<<: !include common/base.yaml
+<<: !include common/i2c.yaml

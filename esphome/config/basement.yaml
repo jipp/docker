@@ -2,7 +2,7 @@ substitutions:
   devicename: basement
   comment: Gas und Strom
   name: woke.basement
-  version: 2.2.1
+  version: 2.2.4
   logger: INFO
   clk_pin: GPIO18
   miso_pin: GPIO19
@@ -19,33 +19,44 @@ substitutions:
   rx_pin: GPIO16
   binary_sensor_gas: GPIO21
   energy_use: 1-0:1.8.0
+  energy_use_unit: Wh
+  energy_use_factor: '0.00001'
   energy_win: 1-0:2.8.0
+  energy_win_unit: Wh
+  energy_win_factor: '0.00001'
   power: 1-0:16.7.0
+  power_unit: W
+  power_factor: '0.01'
   gas_puls: gas puls
   gas_current: gas current
   gas_current_2: gas_current_2
   gas_offset: gas offset
   gas: gas
 
-<<: !include common/base.yaml
-<<: !include common/color.yaml
-<<: !include common/font.yaml
-<<: !include common/uart.yaml
-<<: !include common/spi.yaml
-<<: !include common/output.yaml
+esphome:
+  <<: !include common/esphome.yaml
+  on_boot:
+  - then:
+    - display.page.show:
+        id: status_page
+    - switch.turn_on:
+        id: switch_bl
+    - delay: 30s
+    - switch.turn_off:
+        id: switch_bl
 
 esp32:
   board: m5stack-core-esp32
-
-globals:
-- id: total_gas_pulses
-  type: float
-  initial_value: '0.0'
 
 logger:
   logs:
     component: ERROR
   <<: !include common/logger.yaml
+
+globals:
+- id: total_gas_pulses
+  type: float
+  initial_value: '0.0'
 
 text_sensor:
 - <<: !include common/text_sensor_version.yaml
@@ -94,36 +105,36 @@ sensor:
   name: ${energy_use}
   id: sensor_sml_energy_use
   obis_code: 1-0:1.8.0
-  unit_of_measurement: Wh
+  unit_of_measurement: ${energy_use_unit}
   accuracy_decimals: 2
   device_class: energy
   state_class: total_increasing
   filters:
-  - multiply: 0.00001
+  - multiply: ${energy_use_factor}
   - throttle: 1s
   - throttle_average: 60s
 - platform: sml
   name: ${energy_win}
   id: sensor_sml_energy_win
   obis_code: 1-0:2.8.0
-  unit_of_measurement: Wh
+  unit_of_measurement: ${energy_win_unit}
   accuracy_decimals: 2
   device_class: energy
   state_class: total_increasing
   filters:
-  - multiply: 0.00001
+  - multiply: ${energy_win_factor}
   - throttle: 1s
   - throttle_average: 60s
 - platform: sml
   name: ${power}
   id: sensor_sml_power
   obis_code: 1-0:16.7.0
-  unit_of_measurement: W
+  unit_of_measurement: ${power_unit}
   accuracy_decimals: 2
   device_class: power
   state_class: measurement
   filters:
-  - multiply: 0.01
+  - multiply: ${power_factor}
   - throttle: 1s
   - throttle_average: 60s
 
@@ -175,6 +186,9 @@ binary_sensor:
     - lambda: !lambda |-
         id(total_gas_pulses) += 0.01;
 
+button:
+- <<: !include common/restart.yaml
+
 display:
 - platform: ili9xxx
   model: M5STACK
@@ -222,13 +236,13 @@ display:
       it.strftime(it.get_width() - 11, 14, id(roboto_small), blue, TextAlign::BOTTOM_RIGHT, "%d.%m.%Y, %H:%M", id(time_homeassistant).now());
 
       it.print(11, 40, id(roboto), blue, TextAlign::BOTTOM_LEFT, "${energy_use}:");
-      it.printf(it.get_width() - 11, 40, id(roboto), blue, TextAlign::BOTTOM_RIGHT, "%.2f Wh", id(sensor_sml_energy_use).state);
+      it.printf(it.get_width() - 11, 40, id(roboto), blue, TextAlign::BOTTOM_RIGHT, "%.2f ${energy_use_unit}", id(sensor_sml_energy_use).state);
 
       it.print(11, 60, id(roboto), blue, TextAlign::BOTTOM_LEFT, "${energy_win}:");
-      it.printf(it.get_width() - 11, 60, id(roboto), blue, TextAlign::BOTTOM_RIGHT, "%.2f Wh", id(sensor_sml_energy_win).state);
+      it.printf(it.get_width() - 11, 60, id(roboto), blue, TextAlign::BOTTOM_RIGHT, "%.2f ${energy_win_unit}", id(sensor_sml_energy_win).state);
 
       it.print(11, 80, id(roboto), blue, TextAlign::BOTTOM_LEFT, "${power}:");
-      it.printf(it.get_width() - 11, 80, id(roboto), blue, TextAlign::BOTTOM_RIGHT, "%.2f Wh", id(sensor_sml_power).state);
+      it.printf(it.get_width() - 11, 80, id(roboto), blue, TextAlign::BOTTOM_RIGHT, "%.2f ${power_unit}", id(sensor_sml_power).state);
 
 switch:
 - platform: gpio
@@ -237,3 +251,10 @@ switch:
   id: switch_bl
 
 sml:
+
+<<: !include common/color.yaml
+<<: !include common/font.yaml
+<<: !include common/uart.yaml
+<<: !include common/spi.yaml
+<<: !include common/output.yaml
+<<: !include common/base.yaml
