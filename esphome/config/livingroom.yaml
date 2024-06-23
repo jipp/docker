@@ -15,7 +15,12 @@ esphome:
   <<: !include common/esphome.yaml
 
 esp32:
-  board: esp32-s3-devkitc-1
+#  board: esp32-s3-devkitc-1
+  board: m5stack-atoms3
+  variant: esp32s3
+  framework:
+    version: latest
+    platform_version: 6.7.0
 
 logger:
   <<: !include common/logger.yaml

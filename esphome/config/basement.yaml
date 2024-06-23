@@ -75,7 +75,7 @@ sensor:
 - platform: homeassistant
   name: ${gas_offset}
   id: sensor_homeassistant_gas_offset
-  entity_id: input_text.gas_offset
+  entity_id: input_number.gas_offset
   unit_of_measurement: m³
   accuracy_decimals: 2
   internal: true
