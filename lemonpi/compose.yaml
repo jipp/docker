@@ -67,6 +67,20 @@ services:
     restart: unless-stopped
     volumes:
       - /docker/octoprint/octoprint:/octoprint
+  minecraft:
+    container_name: minecraft
+    environment:
+      EULA: "TRUE"
+      INIT_MEMORY: 1G
+      MAX_MEMORY: 3G
+    hostname: minecraft
+    image: itzg/minecraft-server
+    tty: true
+    stdin_open: true
+    ports:
+      - 25565:25565
+    volumes:
+      - /docker/minecraft/data:/data
 networks:
   octoprint:
     name: octoprint
