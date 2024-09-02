@@ -3,11 +3,17 @@ font:
     family: Roboto
     type: gfonts
   id: roboto_small
-  size: 14
+  size: 12
   glyphs: '!"%()+,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz/³µä'
 - file:
     family: Roboto
     type: gfonts
-  id: roboto
-  size: 20
+  id: roboto_medium
+  size: 16
+  glyphs: '!"%()+,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz/³µä'
+- file:
+    family: Roboto
+    type: gfonts
+  id: roboto_normal
+  size: 21
   glyphs: '!"%()+,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz/³µä'
