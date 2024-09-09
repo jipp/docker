@@ -20,6 +20,24 @@ substitutions:
 
   small: "15"
 
+esphome:
+  <<: !include common/esphome.yaml
+  on_boot:
+  - then:
+    - display.page.show:
+        id: status_page
+    - switch.turn_on:
+        id: switch_bl
+    - delay: 30s
+    - switch.turn_off:
+        id: switch_bl
+
+esp32:
+  board: esp32-s3-devkitc-1
+
+logger:
+  <<: !include common/logger.yaml
+
 globals:
   - id: lux
     type: int[100]
@@ -39,27 +57,8 @@ globals:
   - id: max_x
     type: int
     restore_value: false
-    initial_value: "0"
 
-esphome:
-  <<: !include common/esphome.yaml
-  on_boot:
-  - then:
-    - display.page.show:
-        id: status_page
-    - switch.turn_on:
-        id: switch_bl
-    - delay: 30s
-    - switch.turn_off:
-        id: switch_bl
-
-esp32:
-  board: esp32-s3-devkitc-1
-
-logger:
-  <<: !include common/logger.yaml
-
-text_sensor:
+ text_sensor:
 - <<: !include common/text_sensor_version.yaml
 - <<: !include common/text_sensor_wifi_info.yaml
 
