@@ -15,6 +15,10 @@ substitutions:
   button_pin: GPIO41
   ir_pin: GPIO4
   illuminance: illuminance
+  duration: 24h
+  x_grid: 8h
+  graph_width: "124"
+  graph_height: "90"
 
   <<: !include common/font_size.yaml
 
@@ -81,9 +85,10 @@ switch:
 
 graph:
 - id: illuminance_graph
-  duration: 2h
-  width: 108
-  height: 90
+  duration: ${duration}
+  x_grid: ${x_grid}
+  width: ${graph_width}
+  height: ${graph_height}
   traces:
   - sensor: sensor_bh1750_illuminance
     continuous: true
@@ -134,6 +139,7 @@ display:
       it.graph(2, ${tiny} + 2, id(illuminance_graph));
 
       it.printf(2, it.get_height() - 2, id(roboto_tiny), red, TextAlign::BOTTOM_LEFT, "%s", id(text_sensor_version).state.c_str());
+      it.print(it.get_width() - 2, it.get_height() - 2, id(roboto_tiny), blue, TextAlign::BOTTOM_RIGHT, "duration: ${duration}");
 
 <<: !include common/color.yaml
 <<: !include common/font.yaml
