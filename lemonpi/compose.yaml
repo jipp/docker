@@ -69,6 +69,10 @@ services:
       - /docker/octoprint/octoprint:/octoprint
   minecraft:
     container_name: minecraft
+    deploy:
+      resources:
+        limits:
+          cpus: 3.5
     environment:
       EULA: "TRUE"
       INIT_MEMORY: 1G
