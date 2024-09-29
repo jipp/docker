@@ -192,6 +192,7 @@ button:
 display:
 - platform: ili9xxx
   model: M5STACK
+  invert_colors: true
   id: display_ili9xxx
   dc_pin:
     number: ${dc_pin}
