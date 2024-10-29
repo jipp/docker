@@ -1,12 +1,9 @@
 #!/bin/sh
 
-#docker compose -f certbot.yml run certbot certonly -d dyndns.wobilix.de --manual --preferred-challenges dns --email wolfgang.keller@wobilix.de --dry-run
-#docker compose -f certbot.yml run certbot certonly -d dyndns.wobilix.de --manual --preferred-challenges dns --email wolfgang.keller@wobilix.de
-
-../docker.sh pull
-../docker.sh prune
-../docker.sh up
-../docker.sh rm -f
+docker compose pull
+docker system prune -f
+docker compose up
+docker compose rm -f
 
 FILE=.env
 RESULT=$(grep "dry-run" $FILE | grep -v "#" | wc -l)
