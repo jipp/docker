@@ -1,0 +1,20 @@
+name: esphome
+services:
+  workplace:
+    command:
+      - ${COMMAND}
+      - workplace.yaml
+    container_name: workplace
+    environment:
+      TZ: Europe/Berlin
+    image: esphome/esphome:latest
+    network_mode: host
+    restart: "no"
+    stdin_open: true
+    tty: true
+    volumes:
+      - type: bind
+        source: ${PWD}/config
+        target: /config
+        bind:
+          create_host_path: true
