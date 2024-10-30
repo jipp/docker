@@ -3,10 +3,10 @@ services:
   homeassistant:
     container_name: homeassistant
     deploy:
-      resources:
-        limits:
-          cpus: 3.0
-          memory: 1.5G
+#      resources:
+#        limits:
+#          cpus: 3.0
+#          memory: 1.5G
     environment:
       TZ: Europe/Berlin
     hostname: homeassistant
@@ -24,8 +24,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: 0.5
-          memory: 100M
+          cpus: 0.25
+          memory: 50M
     environment:
       TZ: Europe/Berlin
     hostname: nginx
@@ -42,10 +42,10 @@ services:
   octoprint:
     container_name: octoprint
     deploy:
-      resources:
-        limits:
-          cpus: 3.0
-          memory: 2G
+#      resources:
+#        limits:
+#          cpus: 1.5
+#          memory: 750M
     devices:
       - /dev/ttyUSB0:/dev/ttyUSB0
       - /dev/video0:/dev/video0
@@ -72,10 +72,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: 3.5
+          cpus: 3.0
+          memory: 3.5G
     environment:
+      TZ: Europe/Berlin
       EULA: "TRUE"
-      INIT_MEMORY: 1G
       MAX_MEMORY: 3G
     hostname: minecraft
     image: itzg/minecraft-server
