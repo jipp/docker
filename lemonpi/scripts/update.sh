@@ -1,13 +1,13 @@
 #!/bin/sh
 
 echo "\n\n-> docker: lemonpi"
-cd /home/pi/docker/lemonpi && docker compose pull && docker compose up -d
+cd /home/$USER/docker/lemonpi && docker compose pull && docker compose up -d
 
 echo "\n\n-> docker: esphome"
-cd /home/pi/docker/esphome && docker compose pull
+cd /home/$USER/docker/esphome && docker compose pull
 
 echo "\n\n-> docker: certbot"
-cd /home/pi/docker/certbot && docker compose pull
+cd /home/$USER/docker/certbot && docker compose pull
 
 echo "\n\n-> docker: clean-up"
 docker system prune -f
