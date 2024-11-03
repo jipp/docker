@@ -2,11 +2,6 @@ name: lemonpi
 services:
   homeassistant:
     container_name: homeassistant
-    deploy:
-#      resources:
-#        limits:
-#          cpus: 3.0
-#          memory: 1.5G
     environment:
       TZ: Europe/Berlin
     hostname: homeassistant
@@ -41,18 +36,13 @@ services:
       - /docker/nginx/conf.d:/etc/nginx/conf.d
   octoprint:
     container_name: octoprint
-    deploy:
-#      resources:
-#        limits:
-#          cpus: 1.5
-#          memory: 750M
     devices:
       - /dev/ttyUSB0:/dev/ttyUSB0
-      - /dev/video0:/dev/video0
+#      - /dev/video0:/dev/video0
     environment:
-      CAMERA_DEV: /dev/video0
-      ENABLE_MJPG_STREAMER: "true"
-      MJPG_STREAMER_INPUT: -y -n -r 1280x720
+#      CAMERA_DEV: /dev/video0
+#      ENABLE_MJPG_STREAMER: "true"
+#      MJPG_STREAMER_INPUT: -y -n -r 1280x720
       TZ: Europe/Berlin
     hostname: octoprint
     healthcheck:
@@ -69,21 +59,21 @@ services:
       - /docker/octoprint/octoprint:/octoprint
   minecraft:
     container_name: minecraft
-    deploy:
-      resources:
-        limits:
-          cpus: 3.0
-          memory: 3.5G
     environment:
       TZ: Europe/Berlin
       EULA: "TRUE"
-      MAX_MEMORY: 3G
+#      ICON: http://..../some/image.png
+      INIT_MEMORY: 1G
+      MAX_MEMORY: 4G
     hostname: minecraft
     image: itzg/minecraft-server
-    tty: true
-    stdin_open: true
+    networks:
+      minecraft: null
     ports:
       - 25565:25565
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
     volumes:
       - /docker/minecraft/data:/data
 networks:
@@ -92,3 +82,9 @@ networks:
     driver_opts:
       com.docker.network.bridge.name: octoprint
     enable_ipv6: true
+  minecraft:
+    name: minecraft
+    driver_opts:
+      com.docker.network.bridge.name: minecraft
+    enable_ipv6: true
+

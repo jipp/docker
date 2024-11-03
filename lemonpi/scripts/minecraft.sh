@@ -11,4 +11,6 @@ then
 	echo done
 else
 	echo nothing to be done
+        /usr/bin/docker exec minecraft rcon-cli list
+        /usr/bin/docker exec minecraft rcon-cli banlist
 fi
