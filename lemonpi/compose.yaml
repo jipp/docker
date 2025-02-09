@@ -14,6 +14,78 @@ services:
     restart: unless-stopped
     volumes:
       - /docker/homeassistant/config:/config
+  minecraft:
+    container_name: minecraft
+    environment:
+      EULA: "TRUE"
+      INIT_MEMORY: 1G
+      MAX_MEMORY: 6G
+      TYPE: VANILLA
+      TZ: Europe/Berlin
+      USE_AIKAR_FLAGS: "true"
+    hostname: minecraft
+    image: itzg/minecraft-server
+    networks:
+      minecraft: null
+    ports:
+      - 25565:25565
+    restart: always
+    volumes:
+      - /docker/minecraft/data:/data
+  minecraft-backup:
+    container_name: minecraft-backup
+    depends_on:
+      minecraft:
+        condition: service_healthy
+    environment:
+      BACKUP_INTERVAL: 12h
+      PRUNE_BACKUPS_COUNT: "14"
+      RCON_HOST: minecraft
+      TZ: Europe/Berlin
+    hostname: minecraft-backup
+    image: itzg/mc-backup
+    networks:
+      minecraft: null
+    restart: always
+    volumes:
+      - /docker/minecraft/data:/data:ro
+      - /docker/minecraft-backups:/backups
+  minecraft-small:
+    container_name: minecraft-small
+    environment:
+      EULA: "TRUE"
+      INIT_MEMORY: 1G
+      MAX_MEMORY: 3G
+      TYPE: VANILLA
+      TZ: Europe/Berlin
+      USE_AIKAR_FLAGS: "true"
+    hostname: minecraft-small
+    image: itzg/minecraft-server
+    networks:
+      minecraft-small: null
+    ports:
+      - 25566:25565
+    restart: always
+    volumes:
+      - /docker/minecraft-small/data:/data
+  minecraft-small-backup:
+    container_name: minecraft-small-backup
+    depends_on:
+      minecraft:
+        condition: service_healthy
+    environment:
+      BACKUP_INTERVAL: 12h
+      PRUNE_BACKUPS_COUNT: "14"
+      RCON_HOST: minecraft-small
+      TZ: Europe/Berlin
+    hostname: minecraft-small-backup
+    image: itzg/mc-backup
+    networks:
+      minecraft-small: null
+    restart: always
+    volumes:
+      - /docker/minecraft-small/data:/data:ro
+      - /docker/minecraft-small-backups:/backups
   nginx:
     container_name: nginx
     deploy:
@@ -38,11 +110,11 @@ services:
     container_name: octoprint
     devices:
       - /dev/ttyUSB0:/dev/ttyUSB0
-#      - /dev/video0:/dev/video0
+      - /dev/video0:/dev/video0
     environment:
-#      CAMERA_DEV: /dev/video0
-#      ENABLE_MJPG_STREAMER: "true"
-#      MJPG_STREAMER_INPUT: -y -n -r 1280x720
+      CAMERA_DEV: /dev/video0
+      ENABLE_MJPG_STREAMER: "true"
+      MJPG_STREAMER_INPUT: -y -n -r 1280x720
       TZ: Europe/Berlin
     hostname: octoprint
     healthcheck:
@@ -57,34 +129,19 @@ services:
     restart: unless-stopped
     volumes:
       - /docker/octoprint/octoprint:/octoprint
-  minecraft:
-    container_name: minecraft
-    environment:
-      TZ: Europe/Berlin
-      EULA: "TRUE"
-#      ICON: http://..../some/image.png
-      INIT_MEMORY: 1G
-      MAX_MEMORY: 4G
-    hostname: minecraft
-    image: itzg/minecraft-server
-    networks:
-      minecraft: null
-    ports:
-      - 25565:25565
-    restart: unless-stopped
-    stdin_open: true
-    tty: true
-    volumes:
-      - /docker/minecraft/data:/data
 networks:
-  octoprint:
-    name: octoprint
-    driver_opts:
-      com.docker.network.bridge.name: octoprint
-    enable_ipv6: true
   minecraft:
     name: minecraft
     driver_opts:
       com.docker.network.bridge.name: minecraft
     enable_ipv6: true
-
+  minecraft-small:
+    name: minecraft-small
+    driver_opts:
+      com.docker.network.bridge.name: minecraft-small
+    enable_ipv6: true
+  octoprint:
+    name: octoprint
+    driver_opts:
+      com.docker.network.bridge.name: octoprint
+    enable_ipv6: true
