@@ -1,4 +1,0 @@
-include:
-  - compose_livingroom.yaml
-  - compose_basement.yaml
-#  - compose_workplace.yaml

@@ -1,5 +1,26 @@
 name: lemonpi
 services:
+  certbot:
+    container_name: certbot
+    environment:
+      TZ: Europe/Berlin
+    image: certbot/certbot
+    networks:
+      certbot: null
+    restart: "no"
+    volumes:
+      - /docker/certbot/etc/letsencrypt:/etc/letsencrypt
+      - /docker/certbot/var/lib/letsencrypt:/var/lib/letsencrypt
+      - /docker/certbot/var/log/letsencrypt:/var/log/letsencrypt
+  esphome:
+    container_name: essphome
+    environment:
+      TZ: Europe/Berlin
+    image: esphome/esphome:latest
+    network_mode: host
+    restart: "no"
+    volumes:
+      - ${PWD}/config:/config
   homeassistant:
     container_name: homeassistant
     environment:
@@ -71,7 +92,7 @@ services:
   minecraft-small-backup:
     container_name: minecraft-small-backup
     depends_on:
-      minecraft:
+      minecraft-small:
         condition: service_healthy
     environment:
       BACKUP_INTERVAL: 12h
@@ -106,6 +127,7 @@ services:
     restart: unless-stopped
     volumes:
       - /docker/nginx/conf.d:/etc/nginx/conf.d
+      - /docker/certbot/etc/letsencrypt:/etc/letsencrypt:ro
   octoprint:
     container_name: octoprint
     devices:
@@ -130,6 +152,11 @@ services:
     volumes:
       - /docker/octoprint/octoprint:/octoprint
 networks:
+  certbot:
+    name: certbot
+    driver_opts:
+      com.docker.network.bridge.name: certbot
+    enable_ipv6: true
   minecraft:
     name: minecraft
     driver_opts:
