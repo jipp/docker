@@ -15,8 +15,23 @@ END="\e[${RESET}m"
 SECTION="\e[${UNDERLINE};${MAGENTA}m"
 TOPIC="\e[${UNDERLINE};${GREEN}m"
 CONTENT="\e[${BOLD};${YELLOW}m"
+OK="\e[${BOLD};${GREEN}m"
+NOK="\e[${BOLD};${RED}m"
 
-FOLDER="/home/$USER/docker"
+COMPOSE_FOLDER="/home/$USER/docker"
+SRC_FOLDER="/docker"
+BACKUP_FOLDER="/docker/backup"
+USER="wolfgang.keller"
+HOST="ds416play"
+PORT="221"
+REMOTE_FOLDER="lemonpi"
+
+validate_folder () {
+	if [ ! -d "$COMPOSE_FOLDER" ]; then
+		echo -e "\nFolder \"$COMPOSE_FOLDER\" does not exist!\n"
+		exit 1
+	fi
+}
 
 mc_user () {
 	MCUSER=`docker exec $1 rcon-cli list | cut -d' ' -f3`
@@ -28,7 +43,7 @@ docker_update () {
 	echo -e "\n\n${SECTION}docker${END}"
 
 	echo -e "\n-> ${TOPIC}docker:${END} ${CONTENT}lemonpi pull${END}"
-	cd $FOLDER/lemonpi && docker compose pull
+	cd $COMPOSE_FOLDER/lemonpi && docker compose pull
 
 	echo -e "\n-> ${TOPIC}docker:${END} ${CONTENT}lemonpi up${END}"
 	for i in minecraft minecraft-small
@@ -36,10 +51,10 @@ docker_update () {
 		mc_user $i
 		RES=$?
 		if [ $RES -eq 0 ]; then
-			cd $FOLDER/lemonpi && docker compose up -d $i
+			cd $COMPOSE_FOLDER/lemonpi && docker compose up -d $i
 		fi
 	done
-	cd $FOLDER/lemonpi && docker compose up -d nginx homeassistant octoprint minecraft-backup minecraft-small-backup -d
+	cd $COMPOSE_FOLDER/lemonpi && docker compose up -d nginx homeassistant octoprint minecraft-backup minecraft-small-backup -d
 
 	echo -e "\n-> ${TOPIC}docker:${END} ${CONTENT}prune${END}"
 	docker system prune -f
@@ -61,17 +76,17 @@ certbot () {
 	echo -e "\n\n${SECTION}certbot${END}: $COMMAND"
 
 	echo -e "\n-> ${TOPIC}certbot:${END} ${CONTENT}renew Certificate${END}"
-	cd $FOLDER/lemonpi && docker compose run --rm -p 8080:80 certbot $COMMAND
-#	cd $FOLDER/lemonpi && docker compose run --rm -p 8080:80 certbot renew --dry-run
-#	cd $FOLDER/lemonpi && docker compose run --rm -p 8080:80 certbot renew
-#	cd $FOLDER/lemonpi && docker compose run --rm -p 8080:80 certbot certonly --dry-run --standalone --agree-tos --expand --preferred-challenges=http --email wolfgang.keller@wobilix.de --domain dyndns.wobilix.de
-#	cd $FOLDER/lemonpi && docker compose run --rm -p 8080:80 certbot certonly --standalone --agree-tos --expand --preferred-challenges=http --email wolfgang.keller@wobilix.de --domain dyndns.wobilix.de
+	cd $COMPOSE_FOLDER/lemonpi && docker compose run --rm -p 8080:80 certbot $COMMAND
+#	cd $COMPOSE_FOLDER/lemonpi && docker compose run --rm -p 8080:80 certbot renew --dry-run
+#	cd $COMPOSE_FOLDER/lemonpi && docker compose run --rm -p 8080:80 certbot renew
+#	cd $COMPOSE_FOLDER/lemonpi && docker compose run --rm -p 8080:80 certbot certonly --dry-run --standalone --agree-tos --expand --preferred-challenges=http --email wolfgang.keller@wobilix.de --domain dyndns.wobilix.de
+#	cd $COMPOSE_FOLDER/lemonpi && docker compose run --rm -p 8080:80 certbot certonly --standalone --agree-tos --expand --preferred-challenges=http --email wolfgang.keller@wobilix.de --domain dyndns.wobilix.de
 
 	echo -e "\n-> ${TOPIC}certbot:${END} ${CONTENT}reload nginx${END}"
-	cd $FOLDER/lemonpi && docker compose exec -it nginx nginx -s reload
+	cd $COMPOSE_FOLDER/lemonpi && docker compose exec -it nginx nginx -s reload
 
 	echo -e "\n-> ${TOPIC}certbot:${END} ${CONTENT}clean-up${END}"
-	cd $FOLDER/lemonpi && docker compose down certbot
+	cd $COMPOSE_FOLDER/lemonpi && docker compose down certbot
 }
 
 esphome () {
@@ -84,10 +99,10 @@ esphome () {
    echo -e "\n\n${SECTION}esphome${END}: $COMMAND"
 
 	echo -e "\n-> ${TOPIC}esphome:${END} ${CONTENT}basement${END}"
-	cd $FOLDER/lemonpi && docker compose run --rm esphome $COMMAND basement.yaml
+	cd $COMPOSE_FOLDER/lemonpi && docker compose run --rm esphome $COMMAND basement.yaml
 
 	echo -e "\n-> ${TOPIC}esphome:${END} ${CONTENT}livingroom${END}"
-	cd $FOLDER/lemonpi && docker compose run --rm esphome $COMMAND livingroom.yaml
+	cd $COMPOSE_FOLDER/lemonpi && docker compose run --rm esphome $COMMAND livingroom.yaml
 }
 
 apt_update () {
@@ -113,6 +128,54 @@ health () {
 	dmesg -e -l emerg --level=alert,crit,err,warn,notice
 }
 
+backup () {
+	echo -e "\n\n${SECTION}backup${END}"
+
+	sudo mkdir -p $BACKUP_FOLDER
+	if [ $# -eq 0 ]; then
+		SRC_FILES=`ls $SRC_FOLDER | grep -v backup`
+	else
+		SRC_FILES=$*
+	fi
+
+	for SRC in $SRC_FILES
+	do
+		DST=$SRC.tgz
+
+		echo -en "\n-> ${TOPIC}backup:${END} ${CONTENT}$SRC${END} "
+		cd $SRC_FOLDER && sudo tar czf $BACKUP_FOLDER/$DST $SRC 2>/dev/null
+
+		if [ $? -eq 0 ]; then
+			echo -en "${OK}OK${END}"
+		else
+			echo -en "${NOK}NOK${END}"
+			sudo rm $BACKUP_FOLDER/$DST
+		fi
+	done
+}
+
+save () {
+	echo -e "\n\n${SECTION}save${END}"
+
+	if [ $# -eq 0 ]; then
+		SRC_FILES=`ls $BACKUP_FOLDER | grep -v backup`
+	else
+    	SRC_FILES=$*
+	fi
+
+	echo -en "\n-> ${TOPIC}save:${END} ${CONTENT}$HOST${END} "
+	ping -c 1 $HOST 1>/dev/null
+
+	if [ $? -eq 0 ]; then
+    	echo
+    	cd $BACKUP_FOLDER && scp -P$PORT -O * $USER@$HOST:$REMOTE_FOLDER
+	else
+    	echo -e "${NOK}NOK${END}"
+	fi
+}
+
+validate_folder
+
 case $1 in
 	update)
 		apt_update
@@ -131,9 +194,17 @@ case $1 in
 		shift
 		esphome $*
 		;;
+	backup)
+		shift
+		backup $*
+		;;
+	save)
+		shift
+		save $*
+		;;
 	*)
-      echo -e "\n$0 [update|docker|health|certbot|esphome]"
-      ;;
+    	echo -e "\n$0 [update|docker|health|certbot|esphome|backup|save]"
+    	;;
 esac
 
 echo -e "\n"
