@@ -1,7 +1,5 @@
 #!/bin/bash
 
-trap ctrl_c SIGINT
-
 RESET="0"
 
 RED="31"
@@ -28,22 +26,12 @@ REMOTE_HOST="ds416play"
 REMOTE_PORT="221"
 REMOTE_FOLDER="lemonpi"
 
-function ctrl_c() {
-	echo "** Trapped CTRL-C"
-	exit 1
-}
-
-validate_folder () {
-	if [ ! -d "$COMPOSE_FOLDER" ]; then
-		echo -e "\nFolder \"$COMPOSE_FOLDER\" does not exist!\n"
-		exit 1
-	fi
-}
-
-mc_user () {
+check_mc_user () {
 	MC_USER=`docker exec $1 rcon-cli list | cut -d' ' -f3`
-
-	return $MC_USER
+	if [ $MC_USER -eq 0 ]; then
+		return 0
+	fi
+	return 1
 }
 
 docker_update () {
@@ -55,12 +43,11 @@ docker_update () {
 	echo -e "\n-> ${TOPIC}docker:${END} ${CONTENT}up${END}"
 	for i in minecraft minecraft-small
 	do
-		mc_user $i
-		RES=$?
-		if [ $RES -eq 0 ]; then
+		if check_mc_user $i -eq 0; then
 			cd $COMPOSE_FOLDER && docker compose up -d $i
 		fi
 	done
+
 	cd $COMPOSE_FOLDER && docker compose up -d nginx homeassistant octoprint minecraft-backup minecraft-small-backup -d
 
 	echo -e "\n-> ${TOPIC}docker:${END} ${CONTENT}prune${END}"
@@ -74,20 +61,22 @@ docker_update () {
 }
 
 certbot () {
+# commands:
+#	renew --dry-run
+#	renew
+#	certonly --dry-run --standalone --agree-tos --expand --preferred-challenges=http --email wolfgang.keller@wobilix.de --domain dyndns.wobilix.de
+#	certonly --standalone --agree-tos --expand --preferred-challenges=http --email wolfgang.keller@wobilix.de --domain dyndns.wobilix.de
+
+	echo -e "\n\n${SECTION}certbot${END}"
+
 	if [ $# -eq 0 ]; then
 		COMMAND="renew --dry-run"
 	else
 		COMMAND=$*
 	fi
 
-	echo -e "\n\n${SECTION}certbot${END}: $COMMAND"
-
-	echo -e "\n-> ${TOPIC}certbot:${END} ${CONTENT}renew Certificate${END}"
+	echo -e "\n-> ${TOPIC}certbot:${END} ${CONTENT}$COMMAND${END}"
 	cd $COMPOSE_FOLDER && docker compose run --rm -p 8080:80 certbot $COMMAND
-#	cd $COMPOSE_FOLDER && docker compose run --rm -p 8080:80 certbot renew --dry-run
-#	cd $COMPOSE_FOLDER && docker compose run --rm -p 8080:80 certbot renew
-#	cd $COMPOSE_FOLDER && docker compose run --rm -p 8080:80 certbot certonly --dry-run --standalone --agree-tos --expand --preferred-challenges=http --email wolfgang.keller@wobilix.de --domain dyndns.wobilix.de
-#	cd $COMPOSE_FOLDER && docker compose run --rm -p 8080:80 certbot certonly --standalone --agree-tos --expand --preferred-challenges=http --email wolfgang.keller@wobilix.de --domain dyndns.wobilix.de
 
 	echo -e "\n-> ${TOPIC}certbot:${END} ${CONTENT}reload nginx${END}"
 	cd $COMPOSE_FOLDER && docker compose exec -it nginx nginx -s reload
@@ -97,19 +86,19 @@ certbot () {
 }
 
 esphome () {
+	echo -e "\n\n${SECTION}esphome${END}"
+
 	if [ $# -eq 0 ]; then
 		COMMAND="config"
 	else
 		COMMAND=$*
 	fi
 
-   echo -e "\n\n${SECTION}esphome${END}: $COMMAND"
-
-	echo -e "\n-> ${TOPIC}esphome:${END} ${CONTENT}basement${END}"
-	cd $COMPOSE_FOLDER && docker compose run --rm esphome $COMMAND basement.yaml
-
-	echo -e "\n-> ${TOPIC}esphome:${END} ${CONTENT}livingroom${END}"
-	cd $COMPOSE_FOLDER && docker compose run --rm esphome $COMMAND livingroom.yaml
+	echo -e "\n-> ${TOPIC}esphome:${END} ${CONTENT}$COMMAND${END}"
+	for i in basement.yaml livingroom.yaml
+	do
+		cd $COMPOSE_FOLDER && docker compose run --rm esphome $COMMAND $i
+	done
 }
 
 apt_update () {
@@ -137,29 +126,41 @@ health () {
 
 backup () {
 	echo -e "\n\n${SECTION}backup${END}"
-
-	sudo mkdir -p $BACKUP_FOLDER
+	
 	if [ $# -eq 0 ]; then
 		SRC_FILES=`ls $SRC_FOLDER | grep -v backup`
 	else
 		SRC_FILES=$*
 	fi
 
+	sudo mkdir -p $BACKUP_FOLDER
+
 	for SRC in $SRC_FILES
 	do
 		DST=$SRC.tgz
 
 		echo -en "\n-> ${TOPIC}backup:${END} ${CONTENT}$SRC${END} "
-		if [ -f $BACKUP_FOLDER/$DST ]; then 
-			sudo cp $BACKUP_FOLDER/$DST $BACKUP_FOLDER/$DST.backup
-		fi
-		cd $SRC_FOLDER && sudo tar czf $BACKUP_FOLDER/$DST $SRC 2>/dev/null
+		if [ -d $SRC_FOLDER/$SRC ]; then
 
-		if [ $? -eq 0 ]; then
-			echo -en "${OK}OK${END}"
+			if [ -f $BACKUP_FOLDER/$DST ]; then 
+				sudo mv $BACKUP_FOLDER/$DST $BACKUP_FOLDER/$DST.backup
+			fi
+			
+			cd $SRC_FOLDER && sudo tar czf $BACKUP_FOLDER/$DST $SRC 2>/dev/null
+			if [ $? -eq 0 ]; then
+				if [ -f $BACKUP_FOLDER/$DST.backup ]; then
+					sudo rm $BACKUP_FOLDER/$DST.backup
+				fi
+				echo -en "${OK}OK${END}"
+			else
+				if [ -f $BACKUP_FOLDER/$DST.backup ]; then
+					sudo mv $BACKUP_FOLDER/$DST.backup $BACKUP_FOLDER/$DST
+				fi
+				echo -en "${NOK}NOK${END}"
+			fi
+
 		else
 			echo -en "${NOK}NOK${END}"
-			sudo rm $BACKUP_FOLDER/$DST
 		fi
 	done
 }
@@ -167,14 +168,23 @@ backup () {
 save () {
 	echo -e "\n\n${SECTION}save${END}"
 
+	echo -en "\n-> ${TOPIC}local folder:${END} ${CONTENT}$BACKUP_FOLDER${END} "
+	if [ ! -d $BACKUP_FOLDER ]; then
+		echo -e "${NOK}NOK${END}"
+		echo -e "\nFolder \"$BACKUP_FOLDER\" does not exist!\n"
+		exit 1
+	fi
+
 	if [ $# -eq 0 ]; then
 		SRC_FILES=`ls $BACKUP_FOLDER | grep -v backup`
 	else
     	SRC_FILES=$*
 	fi
 
-	echo -en "\n-> ${TOPIC}save:${END} ${CONTENT}$REMOTE_HOST${END} "
-	ping -c 1 $REMOTE_HOST 1>/dev/null
+	echo -en "\n-> ${TOPIC}remote host:${END} ${CONTENT}$REMOTE_HOST${END} "
+#	ping -c 1 $REMOTE_HOST &>/dev/null
+
+	cd $BACKUP_FOLDER && ls -l $SRC_FILES &>/dev/null
 
 	if [ $? -eq 0 ]; then
 		echo
@@ -184,7 +194,24 @@ save () {
 	fi
 }
 
-validate_folder
+list () {
+	echo -e "\n\n${SECTION}list${END}"
+
+	echo -en "\n-> ${TOPIC}list:${END} ${CONTENT}$BACKUP_FOLDER${END} "
+	if [ ! -d $BACKUP_FOLDER ]; then
+		echo -e "${NOK}NOK${END}"
+		echo -e "\nFolder \"$BACKUP_FOLDER\" does not exist!\n"
+		exit 1
+	fi
+
+	echo -e "${OK}OK${END}"
+	ls -lh $BACKUP_FOLDER
+}
+
+if [ ! -d $COMPOSE_FOLDER ]; then
+	echo -e "\nFolder \"$COMPOSE_FOLDER\" does not exist!\n" 
+	exit 1
+fi
 
 case $1 in
 	update)
@@ -211,6 +238,9 @@ case $1 in
 	save)
 		shift
 		save $*
+		;;
+	list)
+		list
 		;;
 	*)
     	echo -e "\n$0 [update|docker|health|certbot|esphome|backup|save]"

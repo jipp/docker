@@ -44,6 +44,8 @@ services:
       TYPE: VANILLA
       TZ: Europe/Berlin
       USE_AIKAR_FLAGS: "true"
+      VERSION: 1.21.5
+#      VERSION: LATEST
     hostname: minecraft
     image: itzg/minecraft-server
     networks:
@@ -80,6 +82,8 @@ services:
       TYPE: VANILLA
       TZ: Europe/Berlin
       USE_AIKAR_FLAGS: "true"
+      VERSION: 1.21.5
+#      VERSION: LATEST
     hostname: minecraft-small
     image: itzg/minecraft-server
     networks:
