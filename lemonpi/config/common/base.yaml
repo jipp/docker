@@ -3,8 +3,8 @@ api:
     key: !secret 'api_encryption_key'
 
 ota:
-- platform: esphome
-  password: !secret 'ota_password'
+  - platform: esphome
+    password: !secret 'ota_password'
 
 network:
   enable_ipv6: true
@@ -14,8 +14,8 @@ wifi:
     ssid: ${devicename}
     password: !secret 'wifi_ap_password'
   networks:
-  - ssid: !secret 'wifi_networks_ssid'
-    password: !secret 'wifi_networks_password'
+    - ssid: !secret 'wifi_networks_ssid'
+      password: !secret 'wifi_networks_password'
 
 captive_portal: {}
 
@@ -23,6 +23,6 @@ web_server:
   port: 80
 
 time:
-- platform: homeassistant
-  id: time_homeassistant
-  timezone: Europe/Berlin
+  - platform: homeassistant
+    id: time_homeassistant
+    timezone: Europe/Berlin
