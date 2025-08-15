@@ -1,5 +1,5 @@
 spi:
-- clk_pin:
-    number: ${clk_pin}
-  mosi_pin:
-    number: ${mosi_pin}
+  - clk_pin:
+      number: ${clk_pin}
+    mosi_pin:
+      number: ${mosi_pin}
