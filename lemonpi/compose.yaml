@@ -13,7 +13,7 @@ services:
       - /docker/certbot/var/lib/letsencrypt:/var/lib/letsencrypt
       - /docker/certbot/var/log/letsencrypt:/var/log/letsencrypt
   esphome:
-    container_name: essphome
+    container_name: esphome
     environment:
       TZ: Europe/Berlin
     image: esphome/esphome:latest
@@ -35,8 +35,8 @@ services:
     restart: unless-stopped
     volumes:
       - /docker/homeassistant/config:/config
-  minecraft:
-    container_name: minecraft
+  minecraft-server:
+    container_name: minecraft-server
     environment:
       EULA: "TRUE"
       INIT_MEMORY: 1G
@@ -44,9 +44,9 @@ services:
       TYPE: VANILLA
       TZ: Europe/Berlin
       USE_AIKAR_FLAGS: "true"
-      VERSION: 1.21.5
-#      VERSION: LATEST
-    hostname: minecraft
+#      VERSION: 1.21.6
+      VERSION: LATEST
+    hostname: minecraft-server
     image: itzg/minecraft-server
     networks:
       minecraft: null
@@ -54,16 +54,16 @@ services:
       - 25565:25565
     restart: always
     volumes:
-      - /docker/minecraft/data:/data
+      - /docker/minecraft-server/data:/data
   minecraft-backup:
     container_name: minecraft-backup
     depends_on:
-      minecraft:
+      minecraft-server:
         condition: service_healthy
     environment:
       BACKUP_INTERVAL: 12h
       PRUNE_BACKUPS_COUNT: "14"
-      RCON_HOST: minecraft
+      RCON_HOST: minecraft-server
       TZ: Europe/Berlin
     hostname: minecraft-backup
     image: itzg/mc-backup
@@ -71,10 +71,10 @@ services:
       minecraft: null
     restart: always
     volumes:
-      - /docker/minecraft/data:/data:ro
+      - /docker/minecraft-server/data:/data:ro
       - /docker/minecraft-backups:/backups
-  minecraft-small:
-    container_name: minecraft-small
+  minecraft-server-small:
+    container_name: minecraft-server-small
     environment:
       EULA: "TRUE"
       INIT_MEMORY: 1G
@@ -82,9 +82,9 @@ services:
       TYPE: VANILLA
       TZ: Europe/Berlin
       USE_AIKAR_FLAGS: "true"
-      VERSION: 1.21.5
-#      VERSION: LATEST
-    hostname: minecraft-small
+#      VERSION: 1.21.6
+      VERSION: LATEST
+    hostname: minecraft-server-small
     image: itzg/minecraft-server
     networks:
       minecraft-small: null
@@ -92,25 +92,25 @@ services:
       - 25566:25565
     restart: always
     volumes:
-      - /docker/minecraft-small/data:/data
-  minecraft-small-backup:
-    container_name: minecraft-small-backup
+      - /docker/minecraft-server-small/data:/data
+  minecraft-backup-small:
+    container_name: minecraft-backup-small
     depends_on:
-      minecraft-small:
+      minecraft-server-small:
         condition: service_healthy
     environment:
       BACKUP_INTERVAL: 12h
       PRUNE_BACKUPS_COUNT: "14"
-      RCON_HOST: minecraft-small
+      RCON_HOST: minecraft-server-small
       TZ: Europe/Berlin
-    hostname: minecraft-small-backup
+    hostname: minecraft-backup-small
     image: itzg/mc-backup
     networks:
       minecraft-small: null
     restart: always
     volumes:
-      - /docker/minecraft-small/data:/data:ro
-      - /docker/minecraft-small-backups:/backups
+      - /docker/minecraft-server-small/data:/data:ro
+      - /docker/minecraft-backups-small:/backups
   nginx:
     container_name: nginx
     deploy:
