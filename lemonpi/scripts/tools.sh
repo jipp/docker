@@ -26,6 +26,9 @@ REMOTE_HOST="ds416play"
 REMOTE_PORT="221"
 REMOTE_FOLDER="lemonpi"
 
+MINECRAFT="minecraft minecraft-small"
+ESPHOME="basement.yaml livingroom.yaml"
+
 check_mc_user () {
 	MC_USER=`docker exec $1 rcon-cli list | cut -d' ' -f3`
 	if [ $MC_USER -eq 0 ]; then
@@ -41,7 +44,7 @@ docker_update () {
 	cd $COMPOSE_FOLDER && docker compose pull
 
 	echo -e "\n-> ${TOPIC}docker:${END} ${CONTENT}up${END}"
-	for i in minecraft minecraft-small
+	for i in $MINECRAFT
 	do
 		if check_mc_user $i -eq 0; then
 			cd $COMPOSE_FOLDER && docker compose up -d $i
@@ -95,7 +98,7 @@ esphome () {
 	fi
 
 	echo -e "\n-> ${TOPIC}esphome:${END} ${CONTENT}$COMMAND${END}"
-	for i in basement.yaml livingroom.yaml
+	for i in $ESPHOME
 	do
 		cd $COMPOSE_FOLDER && docker compose run --rm esphome $COMMAND $i
 	done
@@ -113,6 +116,12 @@ apt_update () {
 
 health () {
 	echo -e "\n\n${SECTION}health${END}"
+
+	echo -e "\n-> ${TOPIC}health:${END} ${CONTENT}uname -a${END}"
+	uname -a
+
+	echo -e "\n-> ${TOPIC}health:${END} ${CONTENT}uptime${END}"
+	uptime
 
 	echo -e "\n-> ${TOPIC}health:${END} ${CONTENT}temperature${END}"
 	vcgencmd measure_temp
@@ -208,6 +217,14 @@ list () {
 	ls -lh $BACKUP_FOLDER
 }
 
+minecraft () {
+   for i in $MINECRAFT
+   do
+      echo $i
+      docker exec $i rcon-cli list
+   done
+}
+
 if [ ! -d $COMPOSE_FOLDER ]; then
 	echo -e "\nFolder \"$COMPOSE_FOLDER\" does not exist!\n" 
 	exit 1
@@ -242,8 +259,11 @@ case $1 in
 	list)
 		list
 		;;
+	minecraft)
+		minecraft
+      ;;
 	*)
-    	echo -e "\n$0 [update|docker|health|certbot|esphome|backup|save]"
+    	echo -e "\n$0 [update|docker|health|certbot|esphome|backup|save|list|minecraft]"
     	;;
 esac
 
