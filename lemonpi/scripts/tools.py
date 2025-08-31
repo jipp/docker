@@ -8,7 +8,7 @@ import time
 import tomllib
 
 folder_compose="/home/$USER/docker/lemonpi"
-folder_compose_esphome="/home/$USER/docker/lemonpi/config"
+folder_compose_esphome="/home/$USER/docker/lemonpi/esphome"
 folder_src="/docker"
 folder_backup="/docker/backup"
 remote_user="wolfgang.keller"

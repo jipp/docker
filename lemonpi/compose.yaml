@@ -20,7 +20,7 @@ services:
     network_mode: host
     restart: "no"
     volumes:
-      - ${PWD}/config:/config
+      - ${PWD}/esphome:/config
   homeassistant:
     container_name: homeassistant
     environment:

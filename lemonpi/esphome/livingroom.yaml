@@ -7,7 +7,7 @@ substitutions:
   devicename: livingroom
   comment: m5stack-atoms3
   name: woke.livingroom
-  version: 2.3.0
+  version: 2.4.1
   logger: INFO
   sda_e_pin: GPIO2
   scl_e_pin: GPIO1
@@ -28,6 +28,7 @@ substitutions:
   <<: !include common/font_size.yaml
 
 esphome:
+  <<: !include common/esphome.yaml
   on_boot:
     - then:
       - display.page.show:
@@ -37,10 +38,8 @@ esphome:
       - delay: 30s
       - switch.turn_off:
           id: switch_bl
-  <<: !include common/esphome.yaml
 
 esp32:
-#  board: m5stack-atoms3
   board: esp32-s3-devkitc-1
   flash_size: 8MB
   cpu_frequency: 240MHZ
@@ -50,6 +49,9 @@ esp32:
 logger:
   <<: !include common/logger.yaml
 
+debug:
+  <<: !include common/debug.yaml
+
 i2c:
   - <<: !include common/i2c.yaml
   - <<: !include common/i2c_e.yaml
@@ -57,12 +59,14 @@ i2c:
 text_sensor:
   - <<: !include common/text_sensor_version.yaml
   - <<: !include common/text_sensor_wifi_info.yaml
+  - <<: !include common/text_sensor_debug.yaml
 
 sensor:
   - <<: !include common/sensor_uptime.yaml
   - <<: !include common/sensor_wifi_signal.yaml
   - <<: !include common/sensor_mpu6886.yaml
   - <<: !include common/sensor_bh1750.yaml
+  - <<: !include common/sensor_debug.yaml
 
 binary_sensor:
   - <<: !include common/binary_sensor_status.yaml

@@ -7,7 +7,7 @@ substitutions:
   devicename: basement
   comment: m5stack-core-esp32-16M
   name: woke.basement
-  version: 2.3.0
+  version: 2.4.1
   logger: INFO
   clk_pin: GPIO18
   miso_pin: GPIO19
@@ -50,10 +50,8 @@ esphome:
         - delay: 30s
         - switch.turn_off:
             id: switch_bl
-  <<: !include common/esphome.yaml
 
 esp32:
-#  board: m5stack-core-esp32-16M
   board: esp32dev
   flash_size: 16MB
   cpu_frequency: 240MHZ
@@ -63,6 +61,9 @@ esp32:
 logger:
   <<: !include common/logger.yaml
 
+debug:
+  <<: !include common/debug.yaml
+
 globals:
   - id: total_gas_pulses
     type: float
@@ -71,10 +72,12 @@ globals:
 text_sensor:
   - <<: !include common/text_sensor_version.yaml
   - <<: !include common/text_sensor_wifi_info.yaml
+  - <<: !include common/text_sensor_debug.yaml
 
 sensor:
   - <<: !include common/sensor_uptime.yaml
   - <<: !include common/sensor_wifi_signal.yaml
+  - <<: !include common/sensor_debug.yaml
   - platform: homeassistant
     name: ${gas_current_2}
     id: sensor_homeassistant_gas_current_2

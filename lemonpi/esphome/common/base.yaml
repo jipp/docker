@@ -20,7 +20,12 @@ wifi:
 captive_portal: {}
 
 web_server:
+#  version: 3
   port: 80
+  local: true
+  auth:
+    username: !secret 'web_server_username'
+    password: !secret 'web_server_password'
 
 time:
   - platform: homeassistant
